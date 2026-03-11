@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 app = Flask(__name__)
 
+# Подключение к базе данных (если переменная DATABASE_URL задана)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 conn = None
 if DATABASE_URL:
@@ -16,7 +17,7 @@ if DATABASE_URL:
         host=url.hostname,
         port=url.port
     )
-    # Создание таблицы при старте
+    # Создание таблицы при старте (если её нет)
     with conn.cursor() as cur:
         cur.execute("""
             CREATE TABLE IF NOT EXISTS messages (
@@ -62,4 +63,6 @@ def get_messages():
     return jsonify(messages)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    # Render передаёт порт через переменную окружения PORT
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
